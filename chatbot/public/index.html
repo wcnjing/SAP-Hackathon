@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+  <head><meta charset="utf-8"><title>Chatbot</title></head>
+  <body>
+    <h1>Chatbot Frontend</h1>
+    <button onclick="ping()">Test backend</button>
+    <pre id="out"></pre>
+    <script>
+      async function ping() {
+        const res = await fetch("/api/chat", {method:"POST"});
+        document.getElementById("out").textContent = await res.text();
+      }
+    </script>
+  </body>
+</html>
