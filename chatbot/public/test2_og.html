@@ -1,3 +1,5 @@
+i have this code below, how do i implement the code in the image?
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -610,6 +612,7 @@
     el.style.height = '28px';
     el.style.height = Math.min(el.scrollHeight, 140) + 'px';
   }
+  ta.addEventListener('input', () => autogrow(ta));
 
   function addTyping(){
     const d = document.createElement('div');
@@ -621,44 +624,11 @@
     return d;
   }
 
-  async function callChatAPI(message){
-    // Change URL if your backend runs on a different origin/port:
-    // e.g. 'http://localhost:3000/api/chat'
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message,
-        sessionId: currentId     // handy to keep server sessions
-      })
-    });
-
-    if (!res.ok) {
-      // backends often return text on error — surface it
-      const errText = await res.text().catch(() => res.statusText);
-      throw new Error(errText || `HTTP ${res.status}`);
-    }
-
-    // support both text and JSON responses
-    const ct = res.headers.get('content-type') || '';
-    if (ct.includes('application/json')) {
-      const data = await res.json();
-      // expect { reply: "..." } — adjust the key if your API differs
-      return data.reply ?? JSON.stringify(data);
-    }
-    return await res.text();
-  }
-
-
-  async function send(){
+  function send(){
     const text = ta.value.trim();
     if (!text) return;
 
-    // find current session
     const s = sessions.find(x => x.id === currentId);
-    if (!s) return;
-
-    // add user's message
     s.messages.push({ role: 'you', text });
     if (s.title === 'New Chat' || s.title === 'Welcome') {
       s.title = text.slice(0, 28);
@@ -666,34 +636,24 @@
     s.updatedAt = Date.now();
     saveSessions(sessions);
 
-    // update UI
     appendBubble('You', text);
     ta.value = '';
     autogrow(ta);
     renderHistory();
-    updateLayoutAndKeepBottom();
 
-    // show typing indicator
     const typing = addTyping();
 
-    try {
-      // ---- REAL BACKEND CALL ----
-      const reply = await callChatAPI(text);
-
+    // Fake AI reply — replace with your backend call
+    setTimeout(() => {
       typing.remove();
+      const reply = `You said: “${text}”.\n\n(Connect your backend to return real AI responses.)`;
       s.messages.push({ role: 'ai', text: reply });
       s.updatedAt = Date.now();
       saveSessions(sessions);
       appendBubble('AI', reply);
       renderHistory();
-      updateLayoutAndKeepBottom();
-    } catch (err) {
-      typing.remove();
-      appendBubble('AI', `⚠️ Backend error: ${err.message || String(err)}`);
-      updateLayoutAndKeepBottom();
-    }
+    }, 400);
   }
-
 
   sendBtn.addEventListener('click', send);
   ta.addEventListener('keydown', (e) => {
@@ -792,6 +752,13 @@
     updateLayoutAndKeepBottom();
   });
 
+  // after sending (right after you append the user bubble)
+  appendBubble('You', text);
+  updateLayoutAndKeepBottom();
+
+  // after AI reply (inside your setTimeout or fetch .then)
+  appendBubble('AI', reply);
+  updateLayoutAndKeepBottom();
 
   // when window size or zoom changes
   window.addEventListener('resize', updateLayoutAndKeepBottom);
@@ -804,4 +771,3 @@
 </script>
 </body>
 </html>
-
