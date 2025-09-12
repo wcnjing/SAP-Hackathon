@@ -1,0 +1,420 @@
+
+:root{
+--bg: #eef3fa;
+--panel: #ffffff;
+--brand: #0a6ed1;
+--muted: #8993a5;
+--line: #e3e8f0;
+--chat-bg: #dfe8f6;
+--ai: #ffffff;
+--user: #f7fafc;
+--shadow: 0 10px 30px rgba(20, 30, 60, .08);
+--radius-lg: 14px;
+--sidebar-w: 300px;
+--sidebar-w-compact: 76px;
+--composer-h: 160px;
+}
+
+html,
+body{
+height: 100%;
+}
+
+body{
+margin: 0;
+font: 15px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+color: #1f2937;
+background: var(--bg);
+overflow: hidden;
+}
+
+/* Responsive full-viewport frame (fixes clipping on smaller screens) */
+.frame{
+width: 100vw;
+height: 100vh;
+background: var(--panel);
+box-shadow: var(--shadow);
+display: grid;
+grid-template-columns: var(--sidebar-w) 1fr;
+transition: grid-template-columns .28s ease;
+}
+
+.frame.compact{
+grid-template-columns: var(--sidebar-w-compact) 1fr;
+}
+
+/* Sidebar */
+.sidebar{
+background: #ffffff;
+border-right: 1px solid var(--line);
+display: flex;
+flex-direction: column;
+gap: 16px;
+padding: 18px 16px;
+}
+
+.brand{
+display: flex;
+align-items: center;
+justify-content: space-between;   /* pushes logo to the right edge */
+gap: 12px;
+}
+
+.brand-logo{
+height: 20px;                      /* tweak 18–24px as you like */
+width: auto;
+display: block;
+flex: 0 0 auto;                    /* prevent shrinking */
+object-fit: contain;
+}
+
+.hamburger{
+width: 38px;
+height: 38px;
+border-radius: 10px;
+border: 1px solid var(--line);
+display: grid;
+place-items: center;
+background: #ffffff;
+cursor: pointer;
+}
+
+.hamburger svg{
+width: 18px;
+height: 18px;
+}
+
+.search{
+display: flex;
+align-items: center;
+gap: 10px;
+background: #f6f7fb;
+border: 1px solid var(--line);
+border-radius: 10px;
+padding: 10px 12px;
+}
+
+.search input{
+border: 0;
+outline: 0;
+background: transparent;
+width: 100%;
+}
+
+.section-title{
+color: var(--muted);
+font-weight: 600;
+font-size: 12px;
+margin: 2px 2px 4px;
+text-transform: uppercase;
+letter-spacing: .04em;
+}
+
+.newchat{
+display: flex;
+align-items: center;
+gap: 10px;
+border: 1px dashed #c8d4e6;
+background: #f9fbff;
+border-radius: 12px;
+padding: 10px 12px;
+cursor: pointer;
+}
+
+.newchat:hover{
+background: #f3f7ff;
+}
+
+.history{
+display: flex;
+flex-direction: column;
+gap: 10px;
+overflow: auto;
+min-height: 0;
+}
+
+.history .item{
+appearance: none;
+-webkit-appearance: none;
+}
+
+.history .item:hover{
+box-shadow: var(--shadow);
+}
+
+.history .item .title{
+font-weight: 600;
+}
+
+.history .item .sub{
+color: var(--muted);
+font-size: 12px;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+
+.history .item.active{
+outline: none;
+border-color: var(--line);
+background: #fff;
+}
+
+.settings{
+margin-top: auto;
+display: flex;
+gap: 10px;
+align-items: center;
+padding: 10px 12px;
+border-radius: 12px;
+border: 1px solid var(--line);
+background: #ffffff;
+cursor: pointer;
+}
+
+/* Chat side */
+.chat{
+background: var(--chat-bg);
+display: flex;
+flex-direction: column;
+position: relative;
+}
+
+.messages{
+padding: 26px clamp(12px, 2vw, 28px) 160px;
+overflow: auto;
+flex: 1 1 auto;
+min-height: 0;
+}
+
+.bubble{
+max-width: min(780px, calc(100% - 2 * clamp(12px, 2vw, 28px)));
+background: var(--ai);
+border: 1px solid rgba(0, 0, 0, .06);
+border-radius: 16px;
+padding: 14px 16px;
+margin: 12px 0;
+box-shadow: 0 1px 0 rgba(0, 0, 0, .03);
+}
+
+.bubble.user{
+margin-left: auto;
+background: var(--user);
+}
+
+.bubble .meta{
+display: flex;
+gap: 8px;
+align-items: center;
+margin-bottom: 6px;
+color: var(--muted);
+font-size: 12px;
+font-weight: 600;
+letter-spacing: .02em;
+}
+
+.bubble .meta .role{
+color: #334155;
+}
+
+.composer{
+position: absolute;
+left: 0;
+right: 0;
+bottom: 0;
+padding: 16px 26px 26px;
+background: linear-gradient(180deg, rgba(223, 232, 246, 0) 0%, rgba(223, 232, 246, .7) 40%, rgba(223, 232, 246, 1) 100%);
+display: flex;
+justify-content: center;
+}
+
+.composer .inner{
+background: #ffffff;
+border: 1px solid var(--line);
+border-radius: 16px;
+width: min(1200px, 92%);
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 10px 12px;
+box-shadow: var(--shadow);
+}
+
+.iconbtn{
+width: 40px;
+height: 40px;
+border-radius: 10px;
+border: 1px solid var(--line);
+display: grid;
+place-items: center;
+background: #ffffff;
+cursor: pointer;
+flex: 0 0 auto;
+}
+
+.input{
+flex: 1 1 auto;
+min-width: 0;
+}
+
+.input textarea{
+width: 100%;
+max-height: 140px;
+min-height: 28px;
+height: 28px;
+resize: none;
+border: 0;
+outline: 0;
+font: inherit;
+line-height: 1.35;
+padding: 8px 2px;
+}
+
+.send{
+background: var(--brand);
+color: #ffffff;
+border-color: transparent;
+}
+
+.send:hover{
+filter: brightness(.96);
+}
+
+.kbd{
+background: #f1f5f9;
+border: 1px solid var(--line);
+padding: 2px 6px;
+border-radius: 8px;
+color: var(--muted);
+font-size: 12px;
+}
+
+/* Scrollbar */
+*::-webkit-scrollbar{
+width: 10px;
+height: 10px;
+}
+
+*::-webkit-scrollbar-thumb{
+background: #c8d4e6;
+border-radius: 10px;
+border: 2px solid transparent;
+background-clip: content-box;
+}
+
+*{
+scrollbar-color: #c8d4e6 transparent;
+}
+
+/* ===== Collapsed sidebar: show ONLY the hamburger ===== */
+.frame.compact .sidebar{
+padding: 18px 0;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: flex-start;
+gap: 0;
+}
+
+.frame.compact .sidebar > :not(.brand){
+display: none !important;
+}
+
+.frame.compact .brand{
+width: 100%;
+display: flex;
+justify-content: center;
+}
+
+.frame.compact .brand-logo{
+display: none !important;
+}
+
+.frame.compact .hamburger{
+width: 44px;
+height: 44px;
+margin: 0;
+display: grid;
+place-items: center;
+}
+
+.frame.compact .sidebar *,
+.frame.compact .hamburger{
+max-width: none !important;
+}
+
+.history .item{
+position: relative;        /* <— critical */
+padding: 12px 14px;
+padding-right: 48px;       /* <— space for trash button */
+border-radius: 12px;
+border: 1px solid var(--line);
+background: #ffffff;
+
+/* your “no outline” tweaks retained */
+appearance: none;
+-webkit-appearance: none;
+outline: none;
+}
+
+/* Optional: subtler active style (keeps a left blue bar) */
+.history .item.active{
+outline: none;
+background: #fff;
+border-color: #dfe6f2;
+box-shadow: inset 3px 0 0 #c7d1db;
+}
+
+/* Delete button */
+.history .item .del{
+position: absolute;
+right: 10px;
+top: 50%;
+transform: translateY(-50%);
+width: 28px;
+height: 28px;
+border-radius: 8px;
+border: 1px solid var(--line);
+background: #ffffff;
+display: none;             /* show on hover/focus */
+place-items: center;
+cursor: pointer;
+z-index: 2;                /* sits above row content */
+pointer-events: auto;
+}
+
+.history .item:hover .del,
+.history .item:focus-within .del{
+display: grid;
+}
+
+.history .item:focus{
+    outline: none;
+    }
+    .history .item:focus-visible{
+    box-shadow: none;
+    }
+
+    .history .item .del svg{
+    width: 14px;
+    height: 14px;
+    pointer-events: none;
+    }
+
+    /* allow the right pane to shrink properly inside the grid */
+.chat{
+min-height: 0;
+}
+
+/* use the dynamic padding instead of a fixed number */
+.messages{
+padding-bottom: calc(var(--composer-h) + 12px);
+scrollbar-gutter: stable both-edges;
+}
+
+/* make message text wrap even for very long words/URLs */
+.bubble > div:last-child{
+white-space: pre-wrap;
+overflow-wrap: anywhere;
+word-break: break-word;
+}
