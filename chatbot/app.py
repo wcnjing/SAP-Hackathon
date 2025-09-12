@@ -4,10 +4,7 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request, jsonify, current_app
 from flask_cors import CORS
 
-# LangChain (pip install langchain langchain-openai)
-from langchain.chat_models import init_chat_model
 
-# Our agents package
 from agents import load_agents
 
 # -----------------------------------------------------------------------------
@@ -32,7 +29,13 @@ def create_app():
     CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     # ---- Initialise LLM and agents and attach to app --------------------
-    llm = init_chat_model("gpt-4o-mini", model_provider="openai")
+    from langchain_openai import ChatOpenAI
+
+    llm = ChatOpenAI(
+        model="gpt-4o-mini",
+        temperature=0.7,
+        api_key=os.getenv("OPENAI_API_KEY")
+    )
 
     app.extensions = getattr(app, "extensions", {})
     app.extensions["llm"] = llm
