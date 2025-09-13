@@ -3,13 +3,21 @@ from typing import List
 from pathlib import Path
 import json
 import time
-from typing import Dict, Any
+from typing import Dict, Any, Optional
+from langchain_core.tools import tool
 
-# Onboarding data storage
+# Data storage setup
 DATA = Path("data")
 DATA.mkdir(exist_ok=True)
 STORE = DATA / "onboarding.json"
+BASE = Path("data")  # For the new tools
 
+def _load_file(p): 
+    """Load JSON file from data directory"""
+    fp = BASE / p
+    return json.loads(fp.read_text(encoding="utf-8")) if fp.exists() else []
+
+# Default onboarding checklist
 DEFAULT_CHECKLIST = [
     {"id": "d1-setup", "title": "Day 1: Laptop, SSO, email, chat", "done": False},
     {"id": "join-channels", "title": "Join team channels & calendars", "done": False},
@@ -33,7 +41,54 @@ def _ensure_user(db, user: str):
     if user not in db:
         db[user] = {"checklist": DEFAULT_CHECKLIST.copy(), "history": []}
 
-# Onboarding-specific functions
+# NEW TOOLS - Using @tool decorator as in your example
+@tool
+def acronym_meaning(key: str) -> str:
+    """Return the meaning of a company acronym."""
+    for row in _load_file("acronyms.json"):
+        if row["key"].lower() == key.lower():
+            try: 
+                from flask import current_app
+                current_app.extensions["metrics"]["tool_calls"] += 1
+            except Exception: 
+                pass
+            return f"{row['key']} = {row['value']}"
+    return f"No entry for '{key}'. Try common ones like 'SFSF', 'S4H', 'EC', 'BTP'."
+
+@tool
+def who_to_ask(topic: str) -> str:
+    """Return the person in charge for a topic."""
+    for row in _load_file("contacts.json"):
+        if topic.lower() in row["topic"].lower():
+            try: 
+                from flask import current_app
+                current_app.extensions["metrics"]["tool_calls"] += 1
+            except Exception: 
+                pass
+            return f"{row['topic'].title()}: {row['name']} ({row.get('contact','n/a')})"
+    return f"I couldn't find an owner for '{topic}'—try topics like 'dummy data', 'sandbox', 'training', or 'onboarding'."
+
+@tool
+def find_docs(query: str, limit: int = 3) -> str:
+    """Find relevant docs by keyword. Returns a short bulleted list."""
+    items = _load_file("docs.json")
+    q = query.lower()
+    hits: List[str] = []
+    for row in items:
+        if q in row["title"].lower() or any(q in t.lower() for t in row.get("tags", [])):
+            hits.append(f"- {row['title']} — {row['link']}")
+            if len(hits) >= limit: 
+                break
+    if not hits:
+        return f"No docs matched '{query}'. Try terms like 'SAP GUI', 'installation', 'training', or 'setup'."
+    try: 
+        from flask import current_app
+        current_app.extensions["metrics"]["tool_calls"] += 1
+    except Exception: 
+        pass
+    return "\n".join(hits)
+
+# EXISTING ONBOARDING FUNCTIONS
 def get_onboarding_checklist(user: str) -> str:
     """Return the user's onboarding checklist as formatted text."""
     db = _load()
@@ -115,10 +170,9 @@ def request_dummy_data(query: str) -> str:
     
     return f"📊 Dummy data requested!\n🎫 Request ID: {req_id}\n📋 Dataset: {dataset} ({size})\n👤 Notifying Jean from Data Team\n⚠️  Reminder: Use sandbox only - no PII allowed!"
 
-# SAP Company info functions (your existing ones)
+# SAP Company info functions
 def get_company_info(query: str) -> str:
     """Retrieve SAP company-specific information"""
-    # TODO: Add RAG integration here
     sap_info = {
         "about": "SAP is a German multinational software corporation that makes enterprise software to manage business operations and customer relations.",
         "founded": "1972",
@@ -144,7 +198,6 @@ def get_company_info(query: str) -> str:
 
 def get_hr_policies(query: str) -> str:
     """Retrieve HR policies and employee handbook information"""
-    # TODO: Add RAG integration here
     hr_topics = {
         "holiday": "SAP employees are entitled to 25 days annual leave plus public holidays. Holiday requests should be submitted via the HR portal at least 2 weeks in advance.",
         "sick leave": "Employees should notify their manager and HR within 24 hours of absence. Medical certificates required for absences longer than 3 days.",
@@ -180,6 +233,23 @@ def get_it_support(query: str) -> str:
 def load_tools() -> List[Tool]:
     """Load and return all available tools for the SAP chatbot."""
     tools = [
+        # New tools using @tool decorator - convert to Tool objects
+        Tool(
+            name="acronym_meaning",
+            description="Get the meaning of SAP company acronyms like SFSF, S4H, EC, BTP, etc.",
+            func=lambda x: acronym_meaning.invoke({"key": x})
+        ),
+        Tool(
+            name="who_to_ask",
+            description="Find the person/team responsible for a topic like 'dummy data', 'sandbox access', 'training'",
+            func=lambda x: who_to_ask.invoke({"topic": x})
+        ),
+        Tool(
+            name="find_docs",
+            description="Search for documentation, guides, or resources by keyword",
+            func=lambda x: find_docs.invoke({"query": x, "limit": 3})
+        ),
+        # Existing onboarding tools
         Tool(
             name="get_onboarding_checklist",
             description="Get a new employee's onboarding checklist and progress. Use their username/email.",
@@ -200,6 +270,7 @@ def load_tools() -> List[Tool]:
             description="Request dummy/test data for sandbox environment. Format: 'username' or 'username:dataset:size'",
             func=request_dummy_data
         ),
+        # Company info tools
         Tool(
             name="company_info",
             description="Get information about SAP company, history, products, and general company details",

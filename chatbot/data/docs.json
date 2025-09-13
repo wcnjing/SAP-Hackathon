@@ -1,0 +1,5 @@
+[
+  {"title": "SAP GUI Installation Guide", "link": "https://help.sap.com/gui", "tags": ["gui", "installation"]},
+  {"title": "VPN Setup Instructions", "link": "https://internal.sap.com/vpn", "tags": ["vpn", "setup"]},
+  {"title": "New Employee Handbook", "link": "https://hr.sap.com/handbook", "tags": ["onboarding", "handbook"]}
+]

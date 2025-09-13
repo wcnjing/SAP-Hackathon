@@ -1,0 +1,8 @@
+[
+  {"key": "SFSF", "value": "SAP SuccessFactors"},
+  {"key": "S4H", "value": "SAP S/4HANA"},
+  {"key": "EC", "value": "Employee Central"},
+  {"key": "BTP", "value": "Business Technology Platform"},
+  {"key": "HCM", "value": "Human Capital Management"},
+  {"key": "ERP", "value": "Enterprise Resource Planning"}
+]
