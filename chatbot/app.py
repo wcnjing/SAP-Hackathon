@@ -8,7 +8,7 @@ from flask_cors import CORS
 from agents import load_agents
 
 # -----------------------------------------------------------------------------
-# Global system prompt for the entire chatbot
+# Global system prompt 
 SYSTEM_PROMPT = """
 You are a chatbot in the SAP Company.
 Your job is to help the employees in the company with different tasks.

@@ -379,6 +379,22 @@
     document.getElementById('frame').classList.toggle('compact');
     requestAnimationFrame(updateLayoutAndKeepBottom);
   });
+
+  // Clear chat on page load
+  window.addEventListener('load', function() {
+    // Clear the chat display
+    const chatContainer = document.getElementById('chat-messages'); // adjust ID to match your HTML
+    if (chatContainer) {
+        chatContainer.innerHTML = '';
+    }
+    
+    // Clear any stored conversation state
+    localStorage.removeItem('chatHistory');
+    sessionStorage.removeItem('chatHistory');
+    
+    // Optional: Show welcome message
+    addMessage('bot', 'Hello! I\'m your SAP assistant. How can I help you today?');
+});
 </script>
 </body>
 </html>
