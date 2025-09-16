@@ -55,6 +55,7 @@ def create_app():
         api_key=os.getenv("OPENAI_API_KEY")
     )
 
+
     app.extensions = getattr(app, "extensions", {})
     app.extensions["llm"] = llm
     app.extensions["system_prompt"] = SYSTEM_PROMPT
